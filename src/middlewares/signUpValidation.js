@@ -11,7 +11,7 @@ export async function signUpValidation(req, res, next){
         return res.status(422).send(errors);
     }
 
-    const isThereEmail = await connection.query(`SELECT * FROM users WHERE email = '${email}'`);
+    const isThereEmail = await connection.query(`SELECT * FROM users WHERE email = $1`, [email]);
     if(isThereEmail.rows[0] !== undefined)
         return res.sendStatus(409);
 

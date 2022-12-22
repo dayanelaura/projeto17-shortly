@@ -6,7 +6,7 @@ export async function signIn(req, res){
     const token = uuidV4();
     
     try {
-        await connection.query(`INSERT INTO bearers ("userId", token) VALUES (${user.id}, '${token}')`);
+        await connection.query(`INSERT INTO bearers ("userId", token) VALUES ($1, $2)`, [user.id, token]);
         res.send({ token });
     } catch(err){
         console.log(err);

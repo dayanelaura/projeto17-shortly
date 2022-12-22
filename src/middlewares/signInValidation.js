@@ -10,11 +10,11 @@ export async function signInValidation(req, res, next){
             return res.status(422).send(errors);
         }
 
-        const { name, password } = req.body;
+        const { email, password } = req.body;
 
-        const isThereName = await connection.query(`SELECT * FROM users WHERE name = $1`, [name]);
+        const isThereEmail = await connection.query(`SELECT * FROM users WHERE email = $1`, [email]);
         
-        const user = isThereName.rows[0];
+        const user = isThereEmail.rows[0];
         if(user === undefined)
             return res.sendStatus(401);
 

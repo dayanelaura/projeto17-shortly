@@ -15,16 +15,16 @@ export async function urlIdValidation(req, res, next){
     const { id } = req.params;
     try{
         const link = await connection.query(`SELECT * FROM links WHERE id=$1`, [id]);
-
+       
         if (link.rows[0] === undefined)
             return res.sendStatus(404);
         
         req.locals = link.rows[0];
+        next();
     }catch(err){
         console.log(err);
         res.sendStatus(500);
     }
-    next();
 }
 
 export async function userValidation(req, res, next){

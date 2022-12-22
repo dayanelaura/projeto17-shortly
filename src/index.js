@@ -9,6 +9,7 @@ import signInRoutes from './routes/signin.routes.js';
 import shortenRoutes from './routes/shorten.routes.js';
 import urlsRoutes from './routes/urls.routes.js';
 import openRoutes from './routes/open.routes.js';
+import userRoutes from './routes/users-me.routes.js';
 
 const app = express();
 app.use(express.json());
@@ -18,6 +19,7 @@ app.use(signInRoutes);
 app.use(shortenRoutes);
 app.use(urlsRoutes);
 app.use(openRoutes);
+app.use(userRoutes);
 
 const port = process.env.PORT || 4000;
 app.listen(port, () => {

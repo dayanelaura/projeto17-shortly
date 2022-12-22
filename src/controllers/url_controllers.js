@@ -5,7 +5,7 @@ export async function shortenUrl(req, res){
     const userId = res.locals.userId;
     const { url } = req.body; 
     try {
-        const shortUrl = nanoid();
+        const shortUrl = nanoid(8);
 
         await connection.query(`INSERT INTO links ("userId", "shortUrl", url) VALUES ($1, $2, $3)`, [userId, shortUrl, url]);
         
@@ -36,6 +36,34 @@ export async function deleteUrlById(req, res){
         const link = req.locals;
         await connection.query(`DELETE FROM links WHERE id=$1`, [link.id]);
         res.sendStatus(204);
+    }catch(err){
+        console.log(err);
+        res.sendStatus(500);
+    }
+}
+
+export async function showMyUrls(req, res){
+    try{
+        const userId = res.locals.userId;
+        const userData = await connection.query(`SELECT users.id, users.name, SUM(links."visitCount") as "visitCount", json_build_object('id', links.id, 'shortUrl', links."shortUrl", 'url', url, 'visitCount', links."visitCount") AS "shortenedUrls"
+            FROM   users
+            JOIN   links ON users.id = links."userId"
+            WHERE links."userId"=${userId}
+            GROUP  BY users.id, links.id;`);
+
+        const a = await connection.query(`
+            SELECT users.id, users.name, SUM(links."visitCount") as "visitCount", 
+                json_agg(
+                    SELECT (id, "shortUrl", url, "visitCount") 
+                    FROM  links
+                    WHERE links."userId"=${userId}
+                ) AS "shortenedUrls"
+            FROM   users
+            JOIN   links ON users.id = links."userId"
+            WHERE links."userId"=${userId}
+            GROUP  BY users.id, links.id;
+        `);
+        res.send(a).status(200);
     }catch(err){
         console.log(err);
         res.sendStatus(500);
