@@ -30,3 +30,14 @@ export async function findUrlById(req, res){
         res.sendStatus(500);
     }
 }
+
+export async function deleteUrlById(req, res){
+    try{
+        const link = req.locals;
+        await connection.query(`DELETE FROM links WHERE id=$1`, [link.id]);
+        res.sendStatus(204);
+    }catch(err){
+        console.log(err);
+        res.sendStatus(500);
+    }
+}
