@@ -15,3 +15,18 @@ export async function shortenUrl(req, res){
         res.sendStatus(500);
     }
 }
+
+export async function findUrlById(req, res){
+    try{
+        const link = req.locals;
+        const urlObject = {
+            id: link.id,
+            shortUrl: link.shortUrl,
+            url: link.url
+        };
+        res.status(200).send(urlObject);
+    }catch(err){
+        console.log(err);
+        res.sendStatus(500);
+    }
+}
