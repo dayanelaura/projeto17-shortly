@@ -46,43 +46,30 @@ export async function showMyUrls(req, res){
     try{
         const userId = res.locals.userId;
 
-        const b = await connection.query(`SELECT SUM("visitCount") AS "visitCount" 
-        FROM links WHERE "userId"=${userId}`);
-        
-        const userData = await connection.query(`SELECT users.id, users.name, SUM(links."visitCount") as "visitCount", json_build_object('id', links.id, 'shortUrl', links."shortUrl", 'url', url, 'visitCount', links."visitCount") AS "shortenedUrls"
-            FROM   links
-            JOIN   users ON users.id = links."userId"
-            WHERE links."userId"=${userId}
-            GROUP  BY users.id, links.id;`);
-/* 
-        const userData = await connection.query(`SELECT users.id, users.name, SUM(links."visitCount") as "visitCount" 
-            FROM links JOIN users ON users.id=links."userId"
-            WHERE links."userId"=${userId}
-            GROUP  BY users.id, links.id;
+        const userData = await connection.query(`
+            SELECT users.id, users.name, SUM("visitCount") AS "visitCount" 
+            FROM users JOIN links
+            ON users.id=links."userId" 
+            WHERE "userId"=${userId} GROUP BY users.id
         `);
- */
-/*         const userData = await connection.query(`SELECT JSON_agg(links.id, links."shortUrl", links.url, links."visitCount") FROM links WHERE links."userId"=${userId}
-        `); */
-/*         const userData = await connection.query(`SELECT json_each(links)
-            FROM links
-            WHERE links."userId"=${userId}
-        `); */
+        const object1 = userData.rows[0];
 
-        /* 
-        const a = await connection.query(`
-            SELECT users.id, users.name, SUM(links."visitCount") as "visitCount", 
-                json_agg(
-                    SELECT (id, "shortUrl", url, "visitCount") 
-                    FROM  links
-                    WHERE links."userId"=${userId}
-                ) AS "shortenedUrls"
-            FROM users
-            JOIN links ON users.id = links."userId"
-            WHERE links."userId"=${userId}
-            GROUP BY users.id, links.id;
-        `); */
+        const userLinks = await connection.query(`
+        SELECT id, "shortUrl", url, "visitCount"
+        FROM links 
+        WHERE "userId"=${userId} 
+        `);
+        const object2 = userLinks.rows;
+        
+        const { id, name, visitCount } = object1;
+        const object3 = {
+            id,
+            name,
+            visitCount,
+            shortenedUrls: object2
+        }
 
-        res.send(b).status(200);
+        res.send(object3).status(200);
     }catch(err){
         console.log(err);
         res.sendStatus(500);

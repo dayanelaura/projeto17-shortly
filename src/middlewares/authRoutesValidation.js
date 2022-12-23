@@ -10,7 +10,7 @@ export async function authRoutesValidation(req, res, next) {
       const user = await connection.query(`SELECT "userId" FROM bearers WHERE token=$1`, [token]);
       
       if(user.rows[0] === undefined)
-        return res.sendStatus(401);
+        return res.sendStatus(404);
 
       const userId = user.rows[0].userId;      
       res.locals.userId = userId;
