@@ -50,15 +50,13 @@ export async function showMyUrls(req, res){
             SELECT users.id, users.name, SUM("visitCount") AS "visitCount" 
             FROM users JOIN links
             ON users.id=links."userId" 
-            WHERE "userId"=${userId} GROUP BY users.id
-        `);
+            WHERE "userId"=$1 GROUP BY users.id`, [userId]);
         const object1 = userData.rows[0];
 
         const userLinks = await connection.query(`
-        SELECT id, "shortUrl", url, "visitCount"
-        FROM links 
-        WHERE "userId"=${userId} 
-        `);
+            SELECT id, "shortUrl", url, "visitCount"
+            FROM links 
+            WHERE "userId"=$1`, [userId]);
         const object2 = userLinks.rows;
         
         const { id, name, visitCount } = object1;
